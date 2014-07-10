@@ -36,7 +36,7 @@
 #include <signal.h> 
  
  
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
  
 #define VENDOR_ID  0x0c45
 #define PRODUCT_ID 0x7401

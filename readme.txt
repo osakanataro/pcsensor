@@ -1,7 +1,8 @@
 
-pcsensor.c mod version pcsensor-1.0.2 by OSAKANA TARO
+pcsensor.c mod version pcsensor-1.0.3 by OSAKANA TARO
   http://blog.osakana.net/archives/category/minor/usbtemper
   https://github.com/osakanataro/pcsensor
+
 
 based on
 pcsensor.c by Juan Carlos Perez (c) 2011 (cray@isp-sl.com)
@@ -16,6 +17,10 @@ multi device support pcsensor.c by Momtchil Momtchev
   Momtchil's pcsensor.c is based on Juan's pcsensor.c version 0.0.1
     http://www.isp-sl.com/pcsensor-0.0.1.tgz
     ( pcsensor-0.0.1.c )
+
++ multi temprature sensor support by Jan Wagner
+  https://github.com/waja/pcsensors/blob/master/debian/patches/multiple_temerature_readings
+
 
 Juan's pcsensor.c is based on Temper.c by Robert Kavaler (c) 2009 (relavak.com)
   http://relavak.wordpress.com/2009/10/17/temper-temperature-sensor-linux-driver/
