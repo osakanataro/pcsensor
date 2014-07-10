@@ -45,6 +45,7 @@
 #define INTERFACE2 0x01
 
 #define MAX_DEV 4
+#define MAX_SENSOR 2
  
 const static int reqIntLen=8;
 const static int reqBulkLen=8;
@@ -269,7 +270,7 @@ void interrupt_read(usb_dev_handle *dev) {
 
 void interrupt_read_temperatura(usb_dev_handle *dev, float *tempC) {
  
-    int r,i, temperature;
+    int r,i, temperature[MAX_SENSOR];
     unsigned char answer[reqIntLen];
     bzero(answer, reqIntLen);
     
@@ -286,9 +287,11 @@ void interrupt_read_temperatura(usb_dev_handle *dev, float *tempC) {
       printf("\n");
     }
     
-    temperature = (answer[3] & 0xFF) + ((signed char)answer[2] << 8);
-    temperature += calibration;
-    *tempC = temperature * (125.0 / 32000.0);
+    for (i=0; i<MAX_SENSOR; i++) {
+        temperature[i] = (answer[3+i*2] & 0xFF) + ((signed char)answer[2+i*2] << 8);
+        temperature[i] += calibration;
+        *tempC = temperature[i] * (125.0 / 32000.0);
+    }
 
 }
 
@@ -325,13 +328,14 @@ void ex_program(int sig) {
  
 int main( int argc, char **argv) {
  
-     float tempc;
-     int c, i;
+     float tempc[MAX_SENSOR];
+     int c, i, j;
      struct tm *local;
      time_t t;
+     int nr_of_sensors = 1;
 
      memset(handles, 0, sizeof(handles));
-     while ((c = getopt (argc, argv, "mfcvhl::a:dD::")) != -1)
+     while ((c = getopt (argc, argv, "mfcvhl::a:dD::n:")) != -1)
      switch (c)
        {
        case 'v':
@@ -380,6 +384,20 @@ int main( int argc, char **argv) {
          } else {           
               break;
          }
+       case 'n':
+         if (!sscanf(optarg,"%j",&nr_of_sensors)==1) {
+             fprintf (stderr, "Error: '%s' is not numeric.\n", optarg);
+             exit(EXIT_FAILURE);
+         } 
+         else 
+         {           
+           if ((nr_of_sensors > MAX_SENSOR) || (nr_of_sensors < 1))
+           {
+             fprintf (stderr, "Error: '%s' is not in range [1..MAX_SENSOR].\n", optarg);
+             exit(EXIT_FAILURE);
+           }
+              break;
+         }
        case '?':
        case 'h':
          printf("pcsensor version %s\n",VERSION);
@@ -391,6 +409,7 @@ int main( int argc, char **argv) {
 	 printf("          -f output only in Fahrenheit\n");
 	 printf("          -a[n] increase or decrease temperature in 'n' degrees for device calibration\n");
 	 printf("          -m output for mrtg integration\n");
+         printf("	   -n[n] read number of sensors [1..MAX_SENSOR]\n");
 	 printf("          -d output with Bus and Device number\n");
 	 printf("          -D display device list\n");
 	 printf("          -D[n] specific device number\n");
@@ -434,17 +453,23 @@ int main( int argc, char **argv) {
 	 interrupt_read(handles[i]);
 
 	 control_transfer(handles[i], uTemperatura );
-	 interrupt_read_temperatura(handles[i], &tempc);
+	 interrupt_read_temperatura(handles[i], tempc);
 
 	 t = time(NULL);
 	 local = localtime(&t);
 	 if (mrtg) {
 	   if (formato>=10) {
-	     printf("%.2f\n", (9.0 / 5.0 * tempc + 32.0));
-	     printf("%.2f\n", (9.0 / 5.0 * tempc + 32.0));
+             for (j=0;j<nr_of_sensors; j++)
+             {
+	       printf("%.2f\n", (9.0 / 5.0 * tempc[j] + 32.0));
+	       printf("%.2f\n", (9.0 / 5.0 * tempc[j] + 32.0));
+             }
 	   } else {
-	     printf("%.2f\n", tempc);
-	     printf("%.2f\n", tempc);
+             for (j=0;j<nr_of_sensors; j++)
+             {
+	       printf("%.2f\n", tempc);
+	       printf("%.2f\n", tempc);
+             }
 	   }
          
 	   printf("%02d:%02d\n", 
@@ -453,7 +478,9 @@ int main( int argc, char **argv) {
 	 
 	   printf("pcsensor\n");
 	 } else {
-	   printf("%04d/%02d/%02d %02d:%02d:%02d ", 
+           for (j=0;j<nr_of_sensors; j++)
+           {
+	     printf("%04d/%02d/%02d %02d:%02d:%02d ", 
 		  local->tm_year +1900, 
 		  local->tm_mon + 1, 
 		  local->tm_mday,
@@ -461,17 +488,18 @@ int main( int argc, char **argv) {
 		  local->tm_min,
 		  local->tm_sec);
 	   
-	   if(devlist>0){
-	     printf("Bus %s Device %s ",devlist_bus[i],devlist_device[i]);
-	   }
-	   printf("Temperature");
-	   if (formato>=10 || formato==0) {
-	     printf(" %.2fF", (9.0 / 5.0 * tempc + 32.0));
-	   }
-	   if ((formato%10)==1 || formato==0) {
-	     printf(" %.2fC", tempc);
-	   }
-	   printf("\n");
+	     if(devlist>0){
+	       printf("Bus %s Device %s ",devlist_bus[i],devlist_device[i]);
+	     }
+	     printf("Temperature%d", j);
+	     if (formato>=10 || formato==0) {
+	       printf(" %.2fF", (9.0 / 5.0 * tempc[j] + 32.0));
+	     }
+	     if ((formato%10)==1 || formato==0) {
+	       printf(" %.2fC", tempc[j]);
+	     }
+	     printf("\n");
+           }
 	 }
 
 	 usb_release_interface(handles[i], INTERFACE1);

@@ -1,7 +1,7 @@
 
 pcsensor.c mod version pcsensor-1.0.2 by OSAKANA TARO
   http://blog.osakana.net/archives/category/minor/usbtemper
-
+  https://github.com/osakanataro/pcsensor
 
 based on
 pcsensor.c by Juan Carlos Perez (c) 2011 (cray@isp-sl.com)
