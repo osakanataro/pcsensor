@@ -275,6 +275,13 @@ void interrupt_read_temperatura(usb_dev_handle *dev, float *tempC) {
     bzero(answer, reqIntLen);
     
     r = usb_interrupt_read(dev, 0x82, answer, reqIntLen, timeout);
+
+    // If reading failed, retry once more...
+    if( r != reqIntLen )
+    {
+          r = usb_interrupt_read(dev, 0x82, answer, reqIntLen, timeout);
+    }
+
     if( r != reqIntLen )
     {
           perror("USB interrupt read"); bad("USB read failed"); 
