@@ -19,6 +19,7 @@ multi device support pcsensor.c by Momtchil Momtchev
     ( pcsensor-0.0.1.c )
 
 + multi temprature sensor support by Jan Wagner
+  this fix for TEMPer2
   https://github.com/waja/pcsensors/blob/master/debian/patches/multiple_temerature_readings
 
 

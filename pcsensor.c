@@ -268,7 +268,7 @@ void interrupt_read(usb_dev_handle *dev) {
     }
 }
 
-void interrupt_read_temperatura(usb_dev_handle *dev, float *tempC) {
+void interrupt_read_temperatura(usb_dev_handle *dev, float *tempC, int nr_of_sensors) {
  
     int r,i, temperature[MAX_SENSOR];
     unsigned char answer[reqIntLen];
@@ -294,7 +294,7 @@ void interrupt_read_temperatura(usb_dev_handle *dev, float *tempC) {
       printf("\n");
     }
     
-    for (i=0; i<MAX_SENSOR; i++) {
+    for (i=0; i<nr_of_sensors; i++) {
         temperature[i] = (answer[3+i*2] & 0xFF) + ((signed char)answer[2+i*2] << 8);
         temperature[i] += calibration;
         *tempC = temperature[i] * (125.0 / 32000.0);
@@ -392,7 +392,7 @@ int main( int argc, char **argv) {
               break;
          }
        case 'n':
-         if (!sscanf(optarg,"%j",&nr_of_sensors)==1) {
+         if (!sscanf(optarg,"%i",&nr_of_sensors)==1) {
              fprintf (stderr, "Error: '%s' is not numeric.\n", optarg);
              exit(EXIT_FAILURE);
          } 
@@ -400,7 +400,7 @@ int main( int argc, char **argv) {
          {           
            if ((nr_of_sensors > MAX_SENSOR) || (nr_of_sensors < 1))
            {
-             fprintf (stderr, "Error: '%s' is not in range [1..MAX_SENSOR].\n", optarg);
+             fprintf (stderr, "Error: '%s' is not in range [1..%i].\n", optarg,MAX_SENSOR);
              exit(EXIT_FAILURE);
            }
               break;
@@ -416,7 +416,7 @@ int main( int argc, char **argv) {
 	 printf("          -f output only in Fahrenheit\n");
 	 printf("          -a[n] increase or decrease temperature in 'n' degrees for device calibration\n");
 	 printf("          -m output for mrtg integration\n");
-         printf("	   -n[n] read number of sensors [1..MAX_SENSOR]\n");
+         printf("	   -n[n] read number of sensors [1..%i]\n",MAX_SENSOR);
 	 printf("          -d output with Bus and Device number\n");
 	 printf("          -D display device list\n");
 	 printf("          -D[n] specific device number\n");
@@ -460,7 +460,7 @@ int main( int argc, char **argv) {
 	 interrupt_read(handles[i]);
 
 	 control_transfer(handles[i], uTemperatura );
-	 interrupt_read_temperatura(handles[i], tempc);
+	 interrupt_read_temperatura(handles[i], tempc, nr_of_sensors);
 
 	 t = time(NULL);
 	 local = localtime(&t);
