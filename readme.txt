@@ -4,6 +4,23 @@ pcsensor.c mod version pcsensor-1.0.3 by OSAKANA TARO
   https://github.com/osakanataro/pcsensor
 
 
+Supported Device
+  TEMPer1.2
+     Thermal sensor 1
+     VENDOR_ID  0x0c45
+     PRODUCT_ID 0x7401
+     idVendor   Microdia
+     iManufacturer RDing
+     iProduct   TEMPer1V1.2
+  TEMPer2
+     Thermal sensor 2
+     VENDOR_ID  0x0c45
+     PRODUCT_ID 0x7401
+     idVendor   Microdia
+     iManufacturer RDing
+     iProduct   TEMPer2_M12_V1.1
+
+
 based on
 pcsensor.c by Juan Carlos Perez (c) 2011 (cray@isp-sl.com)
   http://www.isp-sl.com/pcsensor-1.0.1.tgz

@@ -44,7 +44,9 @@
 #define INTERFACE1 0x00
 #define INTERFACE2 0x01
 
+/* If you want to support more devices, please change following */
 #define MAX_DEV 4
+/* If you want to support more sensors on 1device, please change following */
 #define MAX_SENSOR 2
  
 const static int reqIntLen=8;
@@ -416,7 +418,7 @@ int main( int argc, char **argv) {
 	 printf("          -f output only in Fahrenheit\n");
 	 printf("          -a[n] increase or decrease temperature in 'n' degrees for device calibration\n");
 	 printf("          -m output for mrtg integration\n");
-         printf("	   -n[n] read number of sensors [1..%i]\n",MAX_SENSOR);
+         printf("          -n[n] read number of sensors [1..%i], default value is 1\n",MAX_SENSOR);
 	 printf("          -d output with Bus and Device number\n");
 	 printf("          -D display device list\n");
 	 printf("          -D[n] specific device number\n");
